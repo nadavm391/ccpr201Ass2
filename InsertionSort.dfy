@@ -17,7 +17,6 @@ method PairInsertionSort(a: array<int>)
 			x,y:=y,x;
 		}
 		j:= i-1;
-
 		while j>=0 && a[j]>x
 			invariant Inv2(a[..],j,i,x,y,A)
 			decreases j
@@ -55,10 +54,19 @@ method PairInsertionSort(a: array<int>)
 	}
 	else {
 
-	}
-			
-		
+	}	
 
+}
+predicate Inv2(a: seq<int>, j: int,i:nat,x:int, y:int, A: multiset<int>)
+{
+	0<=i<=|a|-1 &&
+	0<=j<=|a|-3&&
+	SortedSequence(a,0,j-1)&&
+	SortedSequence(a,j+2,i+1)&& 
+	(j>0 ==> a[j+2]>=a[j-1]) &&
+	a[j+2]>x &&
+	multiset(a) == A&&
+	((a[j] == x && a[j+1] == y) || (a[j]==y && a[j+1] == x))
 }
 
 predicate Sorted(a: array<int>, i:nat, j:int)
@@ -69,32 +77,23 @@ predicate Sorted(a: array<int>, i:nat, j:int)
 	 (forall k :: i <= k < j-1 ==> a[k] <= a[k+1]) || a.Length<=1
 }
 
-predicate SortedSequence(a: seq<int>, i:nat, j:int)
-	requires j>0 
-	requires i<=j ==> (0<=i<|a| && 0<=j<|a|)
+predicate SortedSequence(a: seq<int>, i:nat, h:int)
+	requires h>-2
+	requires i<=h ==> (0<=i< |a| && 0<=h<=|a|)
 {
-	(forall k :: i <= k < j-1 ==> a[k] <= a[k+1]) || |a|<=1
+	(forall k :: i <= k <= h-2 ==> a[k] <= a[k+1]) || |a|<=1
 }
 predicate Inv(a: seq<int>, i: nat, j:int, A: multiset<int>)
 {
-	0<=i<|a|-2 &&
-	-1<=j<|a|-3 &&
-	SortedSequence(a,0,i+1) &&
-	multiset(a) == A
-}
-predicate Inv2(a: seq<int>, j: int,i:nat,x:int, y:int, A: multiset<int>)
-{
-	0<=j<=|a|-3&&
-	SortedSequence(a,0,j-1)&&
-	SortedSequence(a,j+2,i+1)&& 
-	(j>0 ==> a[j+2]>=a[j-1]) &&
-	a[j+2]>x &&
-	multiset(a) == A&&
-	((a[j] == x && a[j+1] == y) || (a[j]==y && a[j+1] == x))
+	0<=i<=|a|+1 &&
+	(-1<=j<=|a|-3) && 
+	multiset(a) == A &&
+	SortedSequence(a,0,i-1) 
 }
 
 predicate Inv3(a: seq<int>, j: int,i:nat,x:int, y:int, A: multiset<int>)
 {
+	0<=i<=|a|-1 &&
 	0<=j<=|a|-3&&
 	SortedSequence(a,0,j-1)&&
 	SortedSequence(a,j+1,i+1)&& 
